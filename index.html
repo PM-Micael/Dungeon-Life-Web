@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #181818;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: #262626;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 350px;
+            box-shadow: 0 0 20px rgba(0,0,0,.4);
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            cursor: pointer;
+        }
+
+        #message {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .success {
+            color: #7CFC7C;
+        }
+
+        .error {
+            color: #FF7B7B;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h1>Reset Password</h1>
+
+    <p>Enter your new password.</p>
+
+    <input
+        type="password"
+        id="password"
+        placeholder="New Password">
+
+    <input
+        type="password"
+        id="confirm"
+        placeholder="Confirm Password">
+
+    <button id="resetButton">
+        Change Password
+    </button>
+
+    <div id="message"></div>
+
+</div>
+
+<script>
+console.log("TOP")
+const SUPABASE_URL = "https://mbpsphlldyzzdtrhglbr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_dih5hMaz1q21iRcknN4DDQ_U3qHObWs";
+
+const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
+
+const message = document.getElementById("message");
+
+function showMessage(text, success) {
+    message.innerText = text;
+    message.className = success ? "success" : "error";
+}
+
+document
+.getElementById("resetButton")
+.addEventListener("click", async () => {
+
+    const password = document.getElementById("password").value;
+    const confirm = document.getElementById("confirm").value;
+    if (password.length < 8) {
+        showMessage("Password must be at least 8 characters.", false);
+        return;
+    }
+
+    if (password !== confirm) {
+        showMessage("Passwords do not match.", false);
+        return;
+    }
+
+    const { error } = await client.auth.updateUser({
+        password: password
+    });
+    
+    if (error) {
+        showMessage(error.message, false);
+        return;
+    }
+
+    showMessage(
+        "Password updated successfully. You may now close this page and log into the game.",
+        true
+    );
+
+});
+
+</script>
+
+</body>
+</html>
