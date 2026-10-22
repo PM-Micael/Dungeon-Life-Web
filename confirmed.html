@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roots To No End - Account</title>
+<style>                                                         :root {
+    --bg: #090816; --panel: #14112e; --line: #6a4a1a; --text: #ffffff;                                                          --muted: #aeb6ger: #d96659; --ok:#5cd9a1;                                                        }
+  * { box-sizing: border-box; }                                 body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 2
+    background: var(--bg); color: var(--text);
+    font-family: sgoe UI", Roboto,
+sans-serif;
+  }
+  main {
+    width: 100%; max-width: 420px; background: var(--panel);
+    border: 2px solid var(--line); border-radius: 10px; padding:
+32px 28px;
+  }
+  h1 { margin: 0 0 6px; font-size: 1.5rem; letter-spacing: .04em;
+color: var(--accen
+  p { line-height: 1.5; color: var(--muted); margin: 8px 0; }
+  label { display: block; margin: 16px 0 6px; font-size: .9rem; }
+  input {
+    width: 100%; padding: 12px; font-size: 1rem; color:
+var(--text);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+  }
+  input:focus { ouar(--accent); }
+  button {
+    width: 100%; mpx; font-size: 1rem;
+font-weight: 600;
+    color: var(--t border: 2px solidvar(--accent);
+    border-radius: 6px; cursor: pointer;
+  }
+  button:hover:not(:disabled) { background: #1d1944; }
+  button:disabled lt; }
+  .message { margin-top: 14px; min-height: 1.4em; font-size:
+.95rem; }
+  .error { color: var(--danger); }
+  .ok { color: var
+  [hidden] { displ
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title">Roots To No End</h1>
+  <p id="intro"></
+
+  <form id="reset-form" hidden>
+    <label for="pa
+    <input id="password" type="password" autocomplete="new-password" minlength="6" required>
+    <label for="colabel>
+    <input id="confirm" type="password" autocomplete="new-password" minlength="6" required>
+    <button id="suassword</button>
+  </form>
+
+  <p id="message" class="message" role="status"></p>
+</main>
+
+<script>
+  // The project's public address and publishable key, the same
+ones the game uses
+  const SUPABASE_Urhglbr.supabase.co";
+  const SUPABASE_K"sb_publishable_dih5hMaz1q21iRcknN4DDQ_U3qHObWs";
+  const MIN_PASSWORD_LENGTH = 6;
+
+  const $ = (id) => document.getElementById(id);
+
+  // Supabase puts after the # (orsometimes after the ?)
+  const params = n
+    location.hash.replace(/^#/, "") + "&" +
+location.search.re
+  const accessToken = params.get("access_token");
+  const type = params.get("type");
+  const errorCode
+  const errorDescrescription");
+
+  // The link carrneeded and take itout of the address bar
+  history.replaceState(null, "", location.pathname);
+
+  function show(title, intro, kind) {
+    $("title").textContent = title;
+    $("intro").tex
+    $("intro").className = kind || "";
+  }
+
+  function say(text, kind) {
+    const message
+    message.textContent = text;
+    message.classN"");
+  }
+
+  if (errorCode ||
+    const expired = errorCode === "otp_expired";
+    show(expired ? went wrong",
+      expired
+        ? "This link has expired or has already been used. Go back to the game and ask for a new one."
+        : (errorDescription || "The link could not be
+used.").replace(/\
+      "error");
+  } else if (accessToken && type === "recovery") {
+    show("Choose a new password", "Pick a new password for your
+Explorer's account
+    $("reset-form").hidden = false;
+    $("password").
+  } else if (accessToken && (type === "signup" || type === "invite" || type === "magiclink" || type === "email_change")) {
+    show("Email confirmed", "Your email is confirmed. You can close this page and log in from the game.", "ok");
+  } else {
+    show("Roots To No End", "There is nothing to do here. Open the link from your email, or head back to the game.");
+  }
+
+  $("reset-form").sync (event) => {
+    event.preventDefault();
+    const password = $("password").value;
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      say("The pas_PASSWORD_LENGTH + " characters.", "error");
+      return;
+    }
+    if (password !
+      say("The two passwords do not match.", "error");
+      return;
+    }
+
+    $("submit").di
+    say("Changing
+    try {
+      const response = await fetch(SUPABASE_URL + "/auth/v1/user", {
+        method: "P
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorioken,
+          "Content-Type": "application/json",
+        },
+        body: JSON
+      });
+      if (response.ok) {
+        $("reset-form").hidden = true;
+        show("Passd has been changed.You can close this page and log in from the game.", "ok");
+        say("");
+        return;
+      }
+      const body = await response.json().catch(() => ({}));
+      say(body.msg || body.message || body.error_description || "The password could not be changed.", "error");
+    } catch (failu
+      say("Could nour connection andtry again.", "error");
+    }
+    $("submit").di
+  });
+</script>
+</body>
+</html>
